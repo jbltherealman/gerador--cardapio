@@ -15,6 +15,10 @@ export const UI = {
         price: () => document.getElementById('item-price'),
         category: () => document.getElementById('item-category'),
         img: () => document.getElementById('item-img'),
+        imgFile: () => document.getElementById('item-img-file'),
+        imgPreviewContainer: () => document.getElementById('item-img-preview-container'),
+        imgPreview: () => document.getElementById('item-img-preview'),
+        imgRemove: () => document.getElementById('item-img-remove'),
         featured: () => document.getElementById('item-featured'),
         btnSave: () => document.getElementById('btn-save-item'),
         btnCancel: () => document.getElementById('btn-cancel-item')
@@ -90,6 +94,18 @@ export const UI = {
         this.itemForm.price().value = item.price || '';
         this.itemForm.category().value = item.category || '';
         this.itemForm.img().value = item.img || '';
+        
+        // Atualizar preview
+        const imgVal = item.img || '';
+        if (imgVal) {
+            if (this.itemForm.imgPreviewContainer()) this.itemForm.imgPreviewContainer().style.display = 'flex';
+            if (this.itemForm.imgPreview()) this.itemForm.imgPreview().src = imgVal;
+        } else {
+            if (this.itemForm.imgPreviewContainer()) this.itemForm.imgPreviewContainer().style.display = 'none';
+            if (this.itemForm.imgPreview()) this.itemForm.imgPreview().src = '';
+            if (this.itemForm.imgFile()) this.itemForm.imgFile().value = '';
+        }
+
         this.itemForm.featured().checked = item.featured || false;
         this.itemForm.btnCancel().style.display = item.id ? 'inline-block' : 'none';
         this.itemForm.btnSave().textContent = item.id ? 'Atualizar Produto' : 'Salvar Produto';

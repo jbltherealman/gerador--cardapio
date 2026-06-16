@@ -110,4 +110,66 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 3000);
         });
     }
+
+    // 8. Upload e Preview de Imagem Local (Produtos)
+    const imgFile = UI.itemForm.imgFile ? UI.itemForm.imgFile() : null;
+    const imgInput = UI.itemForm.img();
+    const imgPreviewContainer = UI.itemForm.imgPreviewContainer ? UI.itemForm.imgPreviewContainer() : null;
+    const imgPreview = UI.itemForm.imgPreview ? UI.itemForm.imgPreview() : null;
+    const imgRemove = UI.itemForm.imgRemove ? UI.itemForm.imgRemove() : null;
+
+    if (imgFile) {
+        imgFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validação de formato
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                UI.showMessage('Formato de arquivo inválido. Por favor, utilize JPG, JPEG, PNG ou WEBP.');
+                imgFile.value = '';
+                return;
+            }
+
+            // Validação de tamanho (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                UI.showMessage('A imagem é muito grande. O tamanho máximo permitido é de 5 MB.');
+                imgFile.value = '';
+                return;
+            }
+
+            // Conversão para Base64
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const base64String = evt.target.result;
+                imgInput.value = base64String;
+                if (imgPreview) imgPreview.src = base64String;
+                if (imgPreviewContainer) imgPreviewContainer.style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    if (imgInput) {
+        // Atualiza o preview se o usuário colar uma URL manualmente
+        imgInput.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            if (val) {
+                if (imgPreview) imgPreview.src = val;
+                if (imgPreviewContainer) imgPreviewContainer.style.display = 'flex';
+            } else {
+                if (imgPreviewContainer) imgPreviewContainer.style.display = 'none';
+                if (imgPreview) imgPreview.src = '';
+            }
+        });
+    }
+
+    if (imgRemove) {
+        imgRemove.addEventListener('click', () => {
+            if (imgFile) imgFile.value = '';
+            imgInput.value = '';
+            if (imgPreview) imgPreview.src = '';
+            if (imgPreviewContainer) imgPreviewContainer.style.display = 'none';
+        });
+    }
 });
