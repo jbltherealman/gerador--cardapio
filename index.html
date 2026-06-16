@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Gerador de Cardápio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+    <div id="app" class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>BurgerMenu<span>.Pro</span></h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="section-config">
+                    <i>⚙️</i> Configurações
+                </a>
+                <a href="#" class="nav-item" data-target="section-items">
+                    <i>🍔</i> Itens do Cardápio
+                </a>
+                <a href="#" class="nav-item" data-target="section-export">
+                    <i>🚀</i> Exportar
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Area -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-title">
+                    <h1>Configurações do Restaurante</h1>
+                    <p>Preencha os dados básicos da sua hamburgueria</p>
+                </div>
+                <div class="topbar-profile">
+                    <div class="avatar">👨‍🍳</div>
+                </div>
+            </header>
+
+            <section class="content-area">
+                <!-- Seção Configurações -->
+                <div id="section-config" class="view-section">
+                    <div class="card" id="config-form">
+                        <div class="form-group">
+                            <label for="rest-name">Nome do Restaurante</label>
+                            <input type="text" id="rest-name" placeholder="Ex: Black Burger">
+                        </div>
+                        <div class="form-group">
+                            <label for="rest-logo">Logo (URL)</label>
+                            <input type="text" id="rest-logo" placeholder="https://exemplo.com/logo.png">
+                        </div>
+                        <div class="form-group">
+                            <label for="rest-whatsapp">WhatsApp</label>
+                            <input type="text" id="rest-whatsapp" placeholder="Ex: 11999999999">
+                        </div>
+                        <div class="form-group">
+                            <label for="rest-banner">Banner Promocional (URL)</label>
+                            <input type="text" id="rest-banner" placeholder="https://exemplo.com/banner.jpg">
+                        </div>
+                        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                <label for="rest-color-primary">Cor Principal</label>
+                                <input type="color" id="rest-color-primary" value="#ff4757" style="height: 50px; width: 100%; padding: 5px;">
+                            </div>
+                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                <label for="rest-color-secondary">Cor Secundária</label>
+                                <input type="color" id="rest-color-secondary" value="#2d3436" style="height: 50px; width: 100%; padding: 5px;">
+                            </div>
+                        </div>
+                        <div style="text-align: right; min-height: 20px;">
+                            <span id="auto-save-indicator" style="color: var(--color-primary); font-size: 0.875rem; font-weight: 500; opacity: 0; transition: opacity 0.3s;">Salvo automaticamente ✓</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção Itens do Cardápio -->
+                <div id="section-items" class="view-section" style="display: none;">
+                    <div class="card">
+                        <h3 style="margin-bottom: 15px;">Gerenciar Produtos</h3>
+                        <div style="display: flex; gap: 20px;">
+                            <!-- Form Produtos -->
+                            <div style="flex: 1;">
+                                <input type="hidden" id="item-id">
+                                <div class="form-group">
+                                    <label>Nome</label>
+                                    <input type="text" id="item-name" placeholder="Ex: X-Burger">
+                                </div>
+                                <div class="form-group">
+                                    <label>Descrição</label>
+                                    <input type="text" id="item-desc" placeholder="Pão, carne e queijo">
+                                </div>
+                                <div class="form-group">
+                                    <label>Preço (R$)</label>
+                                    <input type="number" id="item-price" step="0.01" placeholder="25.00">
+                                </div>
+                                <div class="form-group">
+                                    <label>Categoria</label>
+                                    <input type="text" id="item-category" placeholder="Ex: Lanches">
+                                </div>
+                                <div class="form-group">
+                                    <label>Imagem (URL)</label>
+                                    <input type="text" id="item-img" placeholder="https://...">
+                                </div>
+                                <div class="form-group" style="flex-direction: row; align-items: center;">
+                                    <input type="checkbox" id="item-featured" style="width: auto; margin: 0;">
+                                    <label for="item-featured" style="margin: 0;">Marcar como Destaque</label>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="btn-primary" id="btn-save-item">Salvar Produto</button>
+                                    <button class="btn-primary" id="btn-cancel-item" style="background: var(--color-text-muted); display: none;">Cancelar</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Lista de Produtos -->
+                            <div style="flex: 1.5; overflow-y: auto; max-height: 500px;" id="items-list">
+                                <!-- Itens renderizados aqui via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção Exportar -->
+                <div id="section-export" class="view-section" style="display: none;">
+                    <div class="card" style="text-align: center; padding: 50px 20px;">
+                        <h2 style="margin-bottom: 15px; color: var(--color-primary);">Pronto para ir ao ar?</h2>
+                        <p style="color: var(--color-text-muted); margin-bottom: 30px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                            Gere o arquivo do seu cardápio com todos os produtos, fotos e configurações. O arquivo funcionará totalmente offline ou em qualquer hospedagem.
+                        </p>
+                        <button class="btn-primary" id="btn-export-zip" style="font-size: 1.1rem; padding: 15px 30px; border-radius: 30px; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);">📦 Baixar Cardápio (.ZIP)</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Preview Area -->
+        <aside class="preview-area" style="width: 375px; min-width: 375px; background: var(--color-background); border-left: 1px solid var(--color-border); padding: 20px; display: flex; align-items: center; justify-content: center;">
+            <div id="phone-preview" style="width: 100%; height: 100%; max-height: 800px; background: white; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow-y: auto; overflow-x: hidden; border: 8px solid #2d3436; display: flex; flex-direction: column; position: relative;">
+                <!-- Renderizado via JS -->
+            </div>
+        </aside>
+    </div>
+    
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
