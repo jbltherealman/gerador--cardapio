@@ -2,6 +2,10 @@ export const UI = {
     elements: {
         name: () => document.getElementById('rest-name'),
         logo: () => document.getElementById('rest-logo'),
+        logoFile: () => document.getElementById('rest-logo-file'),
+        logoPreviewContainer: () => document.getElementById('rest-logo-preview-container'),
+        logoPreview: () => document.getElementById('rest-logo-preview'),
+        logoRemove: () => document.getElementById('rest-logo-remove'),
         whatsapp: () => document.getElementById('rest-whatsapp'),
         banner: () => document.getElementById('rest-banner'),
         colorPrimary: () => document.getElementById('rest-color-primary'),
@@ -31,7 +35,18 @@ export const UI = {
     loadConfig(restaurant) {
         if (!restaurant) return;
         if (restaurant.name) this.elements.name().value = restaurant.name;
-        if (restaurant.logo) this.elements.logo().value = restaurant.logo;
+        
+        const logoVal = restaurant.logo || '';
+        this.elements.logo().value = logoVal;
+        if (logoVal) {
+            if (this.elements.logoPreviewContainer()) this.elements.logoPreviewContainer().style.display = 'flex';
+            if (this.elements.logoPreview()) this.elements.logoPreview().src = logoVal;
+        } else {
+            if (this.elements.logoPreviewContainer()) this.elements.logoPreviewContainer().style.display = 'none';
+            if (this.elements.logoPreview()) this.elements.logoPreview().src = '';
+            if (this.elements.logoFile()) this.elements.logoFile().value = '';
+        }
+
         if (restaurant.whatsapp) this.elements.whatsapp().value = restaurant.whatsapp;
         if (restaurant.banner) this.elements.banner().value = restaurant.banner;
         if (restaurant.colorPrimary) this.elements.colorPrimary().value = restaurant.colorPrimary;

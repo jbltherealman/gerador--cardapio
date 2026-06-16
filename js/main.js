@@ -8,7 +8,30 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.renderItems(Store.getItems());
     UI.renderPreview(Store.getRestaurant(), Store.getItems());
 
-    // 2. Configurações - Auto-Save (Debounce)
+    // 2. Função Reutilizável de Upload de Imagem
+    function processImageUpload(file, onSuccess) {
+        if (!file) return false;
+
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+            UI.showMessage('Formato de arquivo inválido. Por favor, utilize JPG, JPEG, PNG ou WEBP.');
+            return false;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            UI.showMessage('A imagem é muito grande. O tamanho máximo permitido é de 5 MB.');
+            return false;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            onSuccess(evt.target.result);
+        };
+        reader.readAsDataURL(file);
+        return true;
+    }
+
+    // 3. Configurações - Auto-Save (Debounce)
     const configForm = document.getElementById('config-form');
     const autoSaveIndicator = document.getElementById('auto-save-indicator');
     let saveTimeout;
@@ -111,7 +134,51 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 8. Upload e Preview de Imagem Local (Produtos)
+    // 8. Upload e Preview de Imagem Local (Logo)
+    const logoFile = UI.elements.logoFile ? UI.elements.logoFile() : null;
+    const logoInput = UI.elements.logo();
+    const logoPreviewContainer = UI.elements.logoPreviewContainer ? UI.elements.logoPreviewContainer() : null;
+    const logoPreview = UI.elements.logoPreview ? UI.elements.logoPreview() : null;
+    const logoRemove = UI.elements.logoRemove ? UI.elements.logoRemove() : null;
+
+    if (logoFile) {
+        logoFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const isValid = processImageUpload(file, (base64String) => {
+                logoInput.value = base64String;
+                if (logoPreview) logoPreview.src = base64String;
+                if (logoPreviewContainer) logoPreviewContainer.style.display = 'flex';
+                // Força o gatilho de auto-save disparando um evento 'input'
+                logoInput.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+            if (!isValid) logoFile.value = '';
+        });
+    }
+
+    if (logoInput) {
+        logoInput.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            if (val) {
+                if (logoPreview) logoPreview.src = val;
+                if (logoPreviewContainer) logoPreviewContainer.style.display = 'flex';
+            } else {
+                if (logoPreviewContainer) logoPreviewContainer.style.display = 'none';
+                if (logoPreview) logoPreview.src = '';
+            }
+        });
+    }
+
+    if (logoRemove) {
+        logoRemove.addEventListener('click', () => {
+            if (logoFile) logoFile.value = '';
+            logoInput.value = '';
+            if (logoPreview) logoPreview.src = '';
+            if (logoPreviewContainer) logoPreviewContainer.style.display = 'none';
+            logoInput.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+    }
+
+    // 9. Upload e Preview de Imagem Local (Produtos)
     const imgFile = UI.itemForm.imgFile ? UI.itemForm.imgFile() : null;
     const imgInput = UI.itemForm.img();
     const imgPreviewContainer = UI.itemForm.imgPreviewContainer ? UI.itemForm.imgPreviewContainer() : null;
@@ -121,32 +188,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (imgFile) {
         imgFile.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (!file) return;
-
-            // Validação de formato
-            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-            if (!validTypes.includes(file.type)) {
-                UI.showMessage('Formato de arquivo inválido. Por favor, utilize JPG, JPEG, PNG ou WEBP.');
-                imgFile.value = '';
-                return;
-            }
-
-            // Validação de tamanho (5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                UI.showMessage('A imagem é muito grande. O tamanho máximo permitido é de 5 MB.');
-                imgFile.value = '';
-                return;
-            }
-
-            // Conversão para Base64
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-                const base64String = evt.target.result;
+            const isValid = processImageUpload(file, (base64String) => {
                 imgInput.value = base64String;
                 if (imgPreview) imgPreview.src = base64String;
                 if (imgPreviewContainer) imgPreviewContainer.style.display = 'flex';
-            };
-            reader.readAsDataURL(file);
+            });
+            if (!isValid) imgFile.value = '';
         });
     }
 

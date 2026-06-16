@@ -50,8 +50,18 @@
                             <input type="text" id="rest-name" placeholder="Ex: Black Burger">
                         </div>
                         <div class="form-group">
-                            <label for="rest-logo">Logo (URL)</label>
-                            <input type="text" id="rest-logo" placeholder="https://exemplo.com/logo.png">
+                            <label>Logo (URL ou Arquivo)</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="text" id="rest-logo" placeholder="https://exemplo.com/logo.png" style="flex: 1;">
+                                <label for="rest-logo-file" class="btn-primary" style="cursor: pointer; padding: 12px 15px; margin: 0; white-space: nowrap; font-size: 0.9rem; text-align: center;">
+                                    📁 Arquivo
+                                </label>
+                                <input type="file" id="rest-logo-file" accept=".jpg,.jpeg,.png,.webp" style="display: none;">
+                            </div>
+                            <div id="rest-logo-preview-container" style="display: none; align-items: center; margin-top: 10px; background: var(--color-background); padding: 10px; border-radius: 8px;">
+                                <img id="rest-logo-preview" src="" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; border: 2px solid var(--color-border);">
+                                <button type="button" id="rest-logo-remove" style="background: none; border: none; color: #ff5252; cursor: pointer; font-size: 0.85rem; margin-left: 15px; font-weight: 600;">Remover Imagem</button>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="rest-whatsapp">WhatsApp</label>
